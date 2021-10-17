@@ -1,6 +1,6 @@
 # How to run application (development mode)
 
-before running it you need a local connection to mongodb, after that
+Before running it you need a local connection to mongodb, after that
 
 1. npm i
 2. npm run dev
