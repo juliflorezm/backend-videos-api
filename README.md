@@ -17,3 +17,5 @@ Multer and gridFs was used to interact with the video files
 # Note
 
 If you want see listed all videos, you must add a label named General which was configured to show all videos you have added.
+
+Secondly trying to do the testing section I got an issue with the node modules folder, more exactly it said like "TextEncoder is not defined", so I tried to do some things to solve it but finnaly I could not find out what was happening.
