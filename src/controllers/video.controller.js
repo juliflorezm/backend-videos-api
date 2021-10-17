@@ -4,11 +4,8 @@ const { GridFSBucket, ObjectId } = require("mongodb");
 const db = require("../db/mongoose");
 const Video = require("../models/video");
 const Label = require("../models/label");
-const { log } = require("console");
 
-const setStorage = () => {
-  return multer.memoryStorage();
-};
+const setStorage = () => multer.memoryStorage();
 
 const setUpload = () => {
   return multer({
@@ -18,11 +15,15 @@ const setUpload = () => {
       if (
         !file.originalname.match(/\.(mp4|mkv|mov|wmv|avi|avchd|flv|f4v|swf)$/)
       ) {
-        cb(new Error("Just videos are acepted"));
+        cb(new Error("Solo se archivos de video"));
       }
 
-      if (length > 50000000) {
-        cb(new Error("video is too big"));
+      if (length > 60000000) {
+        cb(
+          new Error(
+            "El video es muy grande, vuelva a intentarlo con uno de menor peso"
+          )
+        );
       }
       cb(undefined, true);
     },
@@ -41,7 +42,6 @@ const postVideo = async (req, res) => {
     if (error) {
       return res.status(200).send({ variant: "error", message: error.message });
     }
-
     const errorMessage = validateValues(req.body);
     if (errorMessage) {
       return res.status(400).send({ variant: "error", message: errorMessage });
@@ -65,13 +65,13 @@ const postVideo = async (req, res) => {
 
 const validateValues = (body) => {
   if (!body["title"]) {
-    return "video name is required";
+    return "El titulo del video es requerido";
   }
   if (!body["author"]) {
-    return "Author of video is required";
+    return "El autor es requerido";
   }
   if (!body["label_id"]) {
-    return "Video label is required";
+    return "La que etiqueta del video es requerida";
   }
   return undefined;
 };
@@ -107,13 +107,15 @@ const displayVideo = (req, res) => {
   if (!video_id) {
     return res
       .status(400)
-      .send({ varian: "error", message: "video ID is required" });
+      .send({ variant: "error", message: "El ID del video es requerido" });
   }
 
   try {
     video_id = new ObjectId(video_id);
   } catch (e) {
-    return res.status(400).send({ variant: "error", message: "Invalid ID" });
+    return res
+      .status(400)
+      .send({ variant: "error", message: "El ID del video es invalido" });
   }
 
   res.set("content-type", "video/mp4");
@@ -142,13 +144,15 @@ const getVideoData = async (req, res) => {
   if (!video_id) {
     return res
       .status(400)
-      .send({ varian: "error", message: "video ID is required" });
+      .send({ variant: "error", message: "El ID del video es requerido" });
   }
 
   try {
     video_id = new ObjectId(video_id);
   } catch (e) {
-    return res.status(400).send({ variant: "error", message: "Invalid ID" });
+    return res
+      .status(400)
+      .send({ variant: "error", message: "El ID del video es invalido" });
   }
 
   try {
@@ -156,7 +160,7 @@ const getVideoData = async (req, res) => {
     if (!found) {
       return res
         .status(404)
-        .send({ variant: "error", message: "Video not found" });
+        .send({ variant: "error", message: "El video no existe" });
     }
     res.send({ variant: "success", video: found });
   } catch (err) {
@@ -170,7 +174,7 @@ const findVideoByKeyword = async (req, res) => {
   if (!keyword) {
     return res
       .status(400)
-      .send({ varian: "error", message: "La busqueda es requerida" });
+      .send({ variant: "error", message: "Se requiere la búsqueda" });
   }
 
   const regex = /(?!)(\W|$)/;
@@ -194,13 +198,15 @@ const setLikeVideo = async (req, res) => {
   if (!video_id) {
     return res
       .status(400)
-      .send({ varian: "error", message: "video ID is required" });
+      .send({ variant: "error", message: "El ID del video es requerido" });
   }
 
   try {
     video_id = new ObjectId(video_id);
   } catch (e) {
-    return res.status(400).send({ variant: "error", message: "Invalid ID" });
+    return res
+      .status(400)
+      .send({ variant: "error", message: "El ID del video es invalido" });
   }
 
   try {
@@ -208,7 +214,7 @@ const setLikeVideo = async (req, res) => {
     if (!found) {
       return res
         .status(404)
-        .send({ variant: "error", message: "Video not found" });
+        .send({ variant: "error", message: "El video no existe" });
     }
 
     let like = JSON.parse(req.query.like);
@@ -227,13 +233,15 @@ const findVideosByLabelDesc = async (req, res) => {
   if (!label_id) {
     return res
       .status(400)
-      .send({ varian: "error", message: "video ID is required" });
+      .send({ variant: "error", message: "El ID de la etiqueta es requerido" });
   }
 
   try {
     label_id = new ObjectId(label_id);
   } catch (e) {
-    return res.status(400).send({ variant: "error", message: "Invalid ID" });
+    return res
+      .status(400)
+      .send({ variant: "error", message: "El ID de la etiqueta es invalido" });
   }
 
   try {
@@ -241,7 +249,7 @@ const findVideosByLabelDesc = async (req, res) => {
     if (!label) {
       return res
         .status(400)
-        .send({ variant: "error", message: "Label not found" });
+        .send({ variant: "error", message: "Etiqueta no encontrada" });
     }
     if (label["name"] === "General") {
       const all = await Video.find().sort({ createdAt: -1 });

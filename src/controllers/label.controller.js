@@ -22,7 +22,7 @@ const saveLabel = async (req, res) => {
 
 const getAllLabels = async (req, res) => {
   try {
-    const labels = await Label.find().sort({ createdAt: -1 });
+    const labels = await Label.find().sort({ createdAt: 1 });
     res.status(200).send({ variant: "success", labels });
   } catch (e) {
     res.status(500).send({ variant: "error", message: e.message });
